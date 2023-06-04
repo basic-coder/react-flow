@@ -1,0 +1,57 @@
+.queryForm{
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--box-shadow);
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    margin: 1rem auto;
+}
+.queryForm h3{
+    color: var(--purple);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.inputBox{
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+}
+
+.inputBox label{
+    color: var(--black);
+    margin-bottom: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.inputBox select{
+    padding: 10px;
+    background-color:#fff;
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+}
+
+.queryForm button[type="submit"]{
+    margin-top: 20px;
+    padding: 10px;
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+    background-color: var(--purple);
+    color: var(--white);
+    color: #fff;
+}
+
+.queryForm button[type="submit"]:hover{
+    background-color: rgb(87, 3, 164);
+}
+
+@media screen and (max-width: 600px) {
+    .queryForm{
+        width: 100%;
+        margin-top: 5rem;
+    }
+}
