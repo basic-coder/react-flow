@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 
 const Queryboard = () => {
     const [bubbleColor, setBubbleColor] = useState("#ffffff")
-    const [bubbleSize, setBubbleSize] = useState(70)
+    const [bubbleSize, setBubbleSize] = useState(92)
     const [backgroundColor, setBackgroundColor] = useState('#e6e6e6')
     const [textSize, setTextSize] = useState(14)
     const [nodes, setNodes] = useState([]);
@@ -30,65 +30,6 @@ const Queryboard = () => {
   // Make a GET request to the API
   useEffect(() => {
     // Make a GET request to the API
-    axios
-      .get('https://dbpedia.org/sparql', {
-        params: {
-          'default-graph-uri': 'http://dbpedia.org',
-          query: `select distinct ?Concept ?label where {
-            {[] a ?Concept}
-            Union {?Concept a owl:Class}
-            Union {?Concept a rdfs:Class}
-            ?Concept rdfs:label ?label
-            filter (lang(?label)="en")
-          }
-          LIMIT 1000`,
-          format: 'application/sparql-results+json',
-          timeout: 10000,
-          signal_void: 'on',
-          signal_unconnected: 'on',
-        },
-      })
-      .then((response) => {
-        const apiResponse = response.data;
-        const bindings = apiResponse.results.bindings;
-  
-        // Calculate the initial positions for each node
-        const positions = [
-          { x: 100, y: 50 },
-          { x: 300, y: 150 },
-          { x: 100, y: 250 },
-          { x: 100, y: 350 },
-          { x: 300, y: 450 },
-          { x: 600, y: 50 },
-          { x: 600, y: 250 },
-          { x: 800, y: 150 },
-          { x: 800, y: 350 },
-          { x: 1000, y: 50 },
-          { x: 1000, y: 250 },
-        ];
-  
-        const initialNodes = bindings.map((binding, index) => ({
-          id: binding.label.value,
-          data: {
-            label: binding.label.value,
-            uri: binding.Concept.value
-          },
-          position: positions[index % positions.length],
-          type: 'default',
-          ...nodeDefaults
-        }));
-        const initialEdges = bindings.map((binding, index) => ({
-          id: binding.Concept.value.split('/').pop(),
-          source: params.id,
-          target: binding.label.value
-        }));
-        setNodes(initialNodes)
-        setEdges(initialEdges)
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-
       axios
       .get('https://dbpedia.org/sparql', {
         params: {
@@ -107,7 +48,43 @@ const Queryboard = () => {
         }
       })
       .then(response => {
-        console.log(response.data.results.bindings);
+          const apiResponse = response.data;
+         const bindings = apiResponse.results.bindings;
+        console.log(bindings);
+      
+        // Calculate the initial positions for each node
+        const positions = [
+          { x: 100, y: 50 },
+          { x: 300, y: 150 },
+          { x: 100, y: 250 },
+          { x: 100, y: 350 },
+          { x: 300, y: 450 },
+          { x: 600, y: 50 },
+          { x: 600, y: 250 },
+          { x: 800, y: 150 },
+          { x: 800, y: 350 },
+          { x: 1000, y: 50 },
+          { x: 1000, y: 250 },
+        ];
+  
+        const initialNodes = bindings.map((binding, index) => ({
+          id: binding.label_subclass.value,
+          data: {
+            label: binding.label_subclass.value,
+            uri: binding.subclass.value
+          },
+          position: positions[index % positions.length],
+          type: 'default',
+          ...nodeDefaults
+        }));
+        const initialEdges = bindings.map((binding, index) => ({
+          id: binding.label_subclass.value.split('/').pop(),
+          source: params.id,
+          target: binding.label_subclass.value
+        }));
+        console.log(initialNodes.push({id:params.id,data:{label:params.id},position:positions[3],type:'default',...nodeDefaults}));
+        setNodes(initialNodes)
+        setEdges(initialEdges)
       })
   }, []);
    
