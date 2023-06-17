@@ -1,7 +1,8 @@
-import { Background, Controls, ReactFlow, applyEdgeChanges, applyNodeChanges, MarkerType } from 'reactflow';
+import { Background, Controls, ReactFlow, applyEdgeChanges, applyNodeChanges} from 'reactflow';
 import 'reactflow/dist/style.css'
 import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const Queryboard = () => {
     const [bubbleColor, setBubbleColor] = useState("#ffffff")
@@ -9,6 +10,22 @@ const Queryboard = () => {
     const [backgroundColor, setBackgroundColor] = useState('#e6e6e6')
     const [textSize, setTextSize] = useState(14)
     const [nodes, setNodes] = useState([]);
+    const [edges, setEdges] = useState([]);
+    const params = useParams()
+    // console.log(params);
+
+    const nodeDefaults = {
+      style: {
+        fontSize: +textSize,
+        borderRadius: '100%',
+        backgroundColor: bubbleColor,
+        width: 40 + +bubbleSize,
+        height: +bubbleSize,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+    }; 
   
   // Make a GET request to the API
   useEffect(() => {
@@ -51,7 +68,7 @@ const Queryboard = () => {
         ];
   
         const initialNodes = bindings.map((binding, index) => ({
-          id: binding.Concept.value.split('/').pop(),
+          id: binding.label.value,
           data: {
             label: binding.label.value,
             uri: binding.Concept.value
@@ -60,26 +77,40 @@ const Queryboard = () => {
           type: 'default',
           ...nodeDefaults
         }));
+        const initialEdges = bindings.map((binding, index) => ({
+          id: binding.Concept.value.split('/').pop(),
+          source: params.id,
+          target: binding.label.value
+        }));
         setNodes(initialNodes)
+        setEdges(initialEdges)
       })
       .catch((error) => {
         console.error('Error:', error);
       });
+
+      axios
+      .get('https://dbpedia.org/sparql', {
+        params: {
+          'default-graph-uri': 'http://dbpedia.org',
+          query: `SELECT DISTINCT *
+          WHERE {
+          ?subclass rdfs:subClassOf dbo:${params.id.charAt(0).toUpperCase() + params.id.slice(1)} .
+          OPTIONAL{?subclass rdfs:label ?label_subclass.
+          FILTER (lang(?label_subclass) = 'en')}
+          }
+          LIMIT 100`,
+          format: 'application/sparql-results+json',
+          timeout: 10000,
+          signal_void: 'on',
+          signal_unconnected: 'on'
+        }
+      })
+      .then(response => {
+        console.log(response.data.results.bindings);
+      })
   }, []);
-    
-  
-    const nodeDefaults = {
-      style: {
-        fontSize: +textSize,
-        borderRadius: '100%',
-        backgroundColor: bubbleColor,
-        width: 40 + +bubbleSize,
-        height: +bubbleSize,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-    };  
+   
   
     // const initialNodes = [
     //   { id: 'WASHINGTON', data: { label: 'LaJOCONDE A WASHINGTON' }, position: { x: 200, y: 0 }, type: 'default',  ...nodeDefaults},
@@ -130,9 +161,20 @@ const Queryboard = () => {
     // ];
     
   
-    const initialEdges = [];
+    // const initialEdges = [];
+
+    // const initialEdges = [
+    //   { id: 'subclass1', source: 'LILY', target: 'VINCI' },
+    //   { id: 'subclass2', source: 'LILY', target: 'Person'},
+    //   { id: 'subclass3',  source: 'LILY', target: 'James'},
+    //   { id: 'subclass4', source: 'VINCI', target: 'Person'},
+    //   { id: 'subclass5',  source: 'VINCI', target: 'MONA' },
+    //   { id: 'subclass6',  source: 'WASHINGTON', target: 'MONA' },
+    //   { id: 'subclass7',  source: 'MONA', target: 'LOUVRE'},
+    //   { id: 'subclass8',  source: 'LOUVRE', target: 'Museum' },
+    //   { id: 'subclass9',  source: 'LOUVRE', target: 'Paris'},
+    // ];
   
-    const [edges, setEdges] = useState(initialEdges);
   
     const onNodesChange = useCallback(
       (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -155,6 +197,25 @@ const Queryboard = () => {
     //     labelStyle: { fill: '#333', fontSize: 10 },
     //   },
     // };
+
+    // console.log(edges);
+
+    useEffect(() => {
+      setNodes((prevNodes) => {
+        const updatedNodes = prevNodes.map((node) => ({
+          ...node,
+          ...nodeDefaults
+        }));
+        return updatedNodes;
+      });
+      setEdges((prevEdges) => {
+        const updatedEdges = prevEdges.map((edge) => ({
+          ...edge,
+        }));
+        return updatedEdges;
+      });
+    }, [nodes,edges]);
+
   return (
     <div className='right-container'>
         <div className='controls-container'>
@@ -190,6 +251,7 @@ const Queryboard = () => {
 
         <div className='diagram' style={{ height: '500px', width: "80%", border: "1px solid black", padding: "20px" , background: backgroundColor }}>
           <ReactFlow
+
             nodes={nodes}
             onNodesChange={onNodesChange}
             edges={edges}
