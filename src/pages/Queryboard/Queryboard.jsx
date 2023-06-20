@@ -30,6 +30,64 @@ const Queryboard = () => {
   // Make a GET request to the API
   useEffect(() => {
     // Make a GET request to the API
+        // axios
+    //   .get('https://dbpedia.org/sparql', {
+    //     params: {
+    //       'default-graph-uri': 'http://dbpedia.org',
+    //       query: `select distinct ?Concept ?label where {
+    //         {[] a ?Concept}
+    //         Union {?Concept a owl:Class}
+    //         Union {?Concept a rdfs:Class}
+    //         ?Concept rdfs:label ?label
+    //         filter (lang(?label)="en")
+    //       }
+    //       LIMIT 1000`,
+    //       format: 'application/sparql-results+json',
+    //       timeout: 10000,
+    //       signal_void: 'on',
+    //       signal_unconnected: 'on',
+    //     },
+    //   })
+    //   .then((response) => {
+    //     // const apiResponse = response.data;
+    //     // const bindings = apiResponse.results.bindings;
+  
+    //     // // Calculate the initial positions for each node
+    //     // const positions = [
+    //     //   { x: 100, y: 50 },
+    //     //   { x: 300, y: 150 },
+    //     //   { x: 100, y: 250 },
+    //     //   { x: 100, y: 350 },
+    //     //   { x: 300, y: 450 },
+    //     //   { x: 600, y: 50 },
+    //     //   { x: 600, y: 250 },
+    //     //   { x: 800, y: 150 },
+    //     //   { x: 800, y: 350 },
+    //     //   { x: 1000, y: 50 },
+    //     //   { x: 1000, y: 250 },
+    //     // ];
+  
+    //     // const initialNodes = bindings.map((binding, index) => ({
+    //     //   id: binding.label.value,
+    //     //   data: {
+    //     //     label: binding.label.value,
+    //     //     uri: binding.Concept.value
+    //     //   },
+    //     //   position: positions[index % positions.length],
+    //     //   type: 'default',
+    //     //   ...nodeDefaults
+    //     // }));
+    //     // const initialEdges = bindings.map((binding, index) => ({
+    //     //   id: binding.Concept.value.split('/').pop(),
+    //     //   source: params.id,
+    //     //   target: binding.label.value
+    //     // }));
+    //     // setNodes(initialNodes)
+    //     // setEdges(initialEdges)
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error:', error);
+    //   });
       axios
       .get('https://dbpedia.org/sparql', {
         params: {
@@ -51,21 +109,50 @@ const Queryboard = () => {
           const apiResponse = response.data;
          const bindings = apiResponse.results.bindings;
         console.log(bindings);
+
+        const generatePositions = (count, startX, startY, spacingX, spacingY) => {
+          const positions = [];
+        
+          for (let i = 0; i < count; i++) {
+            const angle = (2 * Math.PI * i) / count;
+            let x,y;
+            if(i%2===0){
+               x = centerX + radius * Math.cos(angle + 400);
+             y = centerY + radius * Math.sin(angle + 400);
+            }else{
+               x = centerX + radius * Math.cos(angle);
+               y = centerY + radius * Math.sin(angle);
+            }
+            
+            positions.push({ x, y });
+          }
+        
+        
+          return positions;
+        };
+        
+        // Usage:
+        const nodeCount = bindings.length;
+        const centerX = 500; // X-coordinate of the center of the circle
+        const centerY = 300; // Y-coordinate of the center of the circle
+        const radius = 300; // Radius of the circle
+        const positions = generatePositions(nodeCount, centerX, centerY, radius);
+        
       
         // Calculate the initial positions for each node
-        const positions = [
-          { x: 100, y: 50 },
-          { x: 300, y: 150 },
-          { x: 100, y: 250 },
-          { x: 100, y: 350 },
-          { x: 300, y: 450 },
-          { x: 600, y: 50 },
-          { x: 600, y: 250 },
-          { x: 800, y: 150 },
-          { x: 800, y: 350 },
-          { x: 1000, y: 50 },
-          { x: 1000, y: 250 },
-        ];
+        // const positions = [
+        //   { x: 100, y: 50 },
+        //   { x: 300, y: 150 },
+        //   { x: 100, y: 250 },
+        //   { x: 100, y: 350 },
+        //   { x: 300, y: 450 },
+        //   { x: 600, y: 50 },
+        //   { x: 600, y: 250 },
+        //   { x: 800, y: 150 },
+        //   { x: 800, y: 350 },
+        //   { x: 1000, y: 50 },
+        //   { x: 1000, y: 250 },
+        // ];
   
         const initialNodes = bindings.map((binding, index) => ({
           id: binding.label_subclass.value,
@@ -82,7 +169,9 @@ const Queryboard = () => {
           source: params.id,
           target: binding.label_subclass.value
         }));
-        console.log(initialNodes.push({id:params.id,data:{label:params.id},position:positions[3],type:'default',...nodeDefaults}));
+       initialNodes.push({id:params.id,data:{label:params.id},position:{x:500,y:300},type:'default',...nodeDefaults});
+
+        console.log(initialNodes);
         setNodes(initialNodes)
         setEdges(initialEdges)
       })
