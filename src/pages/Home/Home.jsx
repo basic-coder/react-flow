@@ -1,9 +1,7 @@
-import { Background, Controls, ReactFlow, applyEdgeChanges, applyNodeChanges, MarkerType } from 'reactflow';
 import 'reactflow/dist/style.css'
-import { useCallback, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 import './home.css'
 import axios from 'axios';
-import { BsMoon, BsSun } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader/Loader';
 
@@ -13,10 +11,6 @@ const Home = () => {
     const [theme, setTheme] = useState(false)
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
-    const themeToggler = () =>{
-        setTheme(!theme)
-        document.body.classList.toggle("active");
-      }
 
   // Make a GET request to the API
   useEffect(() => {
