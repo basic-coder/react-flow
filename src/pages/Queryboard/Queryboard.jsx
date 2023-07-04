@@ -131,6 +131,20 @@ const Queryboard = () => {
         document.getElementById("popup-size").textContent = "Size: " + selectedNodes.size;
         document.getElementById("popup-total-nodes").textContent = "Total Nodes: " + selectedNodes.totalNode;
 
+        // Retrieve the top 5 nodes
+        const topNodes = nodes.slice(0, 5);
+
+        // Clear the existing content in the .top-list element
+        const topList = document.querySelector('.top-list');
+        topList.innerHTML = '';
+
+        // Append the top nodes to the .top-list element
+        topNodes.forEach((node) => {
+          const nodeItem = document.createElement('li');
+          nodeItem.textContent = ` ${node.id}`;
+          topList.appendChild(nodeItem);
+        });
+
     };
 
     const closePopup = () => {
@@ -156,61 +170,115 @@ const Queryboard = () => {
     }, [nodes,edges]);
 
   return (
-    <div className='right-container'>
-        <div className='controls-container'>
-          <h2>All Controls </h2>
+    <div className="right-container">
+      <div className="controls-container">
+        <h2>All Controls </h2>
 
-          <div className='input-box-container'>
-            <div className='input-box'>
-              <label>Select the color of Bubble</label>
-              <input type="color" value={bubbleColor} onChange={(e)=>setBubbleColor(e.target.value)} />
-            </div>
-            <div className='input-box'>
-              <div className="range-box">
-                <label>Change size of bubble</label>
-                <input type="text" className="range-input" value={bubbleSize} onChange={(e)=>setBubbleSize(e.target.value)}  id="range-input" maxLength="5" />
-              </div>
-              <input type="range" className="range-slider" value={bubbleSize} onChange={(e)=>setBubbleSize(e.target.value)} minLength="4" maxLength="20" step="0.2"  id="range-slider" />
-            </div>
-            <div className='input-box'>
-              <label  htmlFor="colorInput">Select the color of Background</label>
-              <input type="color" value={backgroundColor} onChange={(e)=>setBackgroundColor(e.target.value)} />
-            </div>
+        <div className="input-box-container">
+          <div className="input-box">
+            <label>Select the color of Bubble</label>
+            <input
+              type="color"
+              value={bubbleColor}
+              onChange={(e) => setBubbleColor(e.target.value)}
+            />
           </div>
-          <div className='input-box-container'>
-            <div className='input-box'>
-              <div className="range-box">
-                <label>Change size of Text</label>
-                <input type="text" className="range-input" value={textSize} onChange={(e)=>setTextSize(e.target.value)}  id="range-input" maxLength="5" />
-              </div>
-              <input type="range" className="range-slider" value={textSize} onChange={(e)=>setTextSize(e.target.value)} minLength="4" maxLength="20" step="0.2"  id="range-slider" />
+          <div className="input-box">
+            <div className="range-box">
+              <label>Change size of bubble</label>
+              <input
+                type="text"
+                className="range-input"
+                value={bubbleSize}
+                onChange={(e) => setBubbleSize(e.target.value)}
+                id="range-input"
+                maxLength="5"
+              />
             </div>
+            <input
+              type="range"
+              className="range-slider"
+              value={bubbleSize}
+              onChange={(e) => setBubbleSize(e.target.value)}
+              minLength="4"
+              maxLength="20"
+              step="0.2"
+              id="range-slider"
+            />
+          </div>
+          <div className="input-box">
+            <label htmlFor="colorInput">Select the color of Background</label>
+            <input
+              type="color"
+              value={backgroundColor}
+              onChange={(e) => setBackgroundColor(e.target.value)}
+            />
           </div>
         </div>
-
-        <div className='diagram' style={{ height: '500px', width: "80%", border: "1px solid black", padding: "20px" , background: backgroundColor }}>
-          <ReactFlow
-
-            nodes={nodes}
-            onNodesChange={onNodesChange}
-            edges={edges}
-            onEdgesChange={onEdgesChange}
-            onNodeClick={onNodeClick}
-          >
-            <Background />
-            <Controls />
-          </ReactFlow>
-        </div>
-
-          <div id="popup-card" className="popup-card">
-            <span className="close-button" onClick={closePopup}><AiOutlineClose /></span>
-            <h2 id="popup-title">TEST</h2>
-            <p id="popup-size"></p>
-            <p id="popup-total-nodes"></p>
+        <div className="input-box-container">
+          <div className="input-box">
+            <div className="range-box">
+              <label>Change size of Text</label>
+              <input
+                type="text"
+                className="range-input"
+                value={textSize}
+                onChange={(e) => setTextSize(e.target.value)}
+                id="range-input"
+                maxLength="5"
+              />
+            </div>
+            <input
+              type="range"
+              className="range-slider"
+              value={textSize}
+              onChange={(e) => setTextSize(e.target.value)}
+              minLength="4"
+              maxLength="20"
+              step="0.2"
+              id="range-slider"
+            />
           </div>
-
+        </div>
       </div>
-  )
+
+      <div
+        className="diagram"
+        style={{
+          height: "500px",
+          width: "80%",
+          border: "1px solid black",
+          padding: "20px",
+          background: backgroundColor,
+        }}
+      >
+        <ReactFlow
+          nodes={nodes}
+          onNodesChange={onNodesChange}
+          edges={edges}
+          onEdgesChange={onEdgesChange}
+          onNodeClick={onNodeClick}
+        >
+          <Background />
+          <Controls />
+        </ReactFlow>
+      </div>
+
+      <div id="popup-card" className="popup-card">
+        <span className="close-button" onClick={closePopup}>
+          <AiOutlineClose />
+        </span>
+        <div className="left-list">
+          <h2 id="popup-title">TEST</h2>
+          <p id="popup-size"></p>
+          <p id="popup-total-nodes"></p>
+        </div>
+        <div className="top-list">
+
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Queryboard
