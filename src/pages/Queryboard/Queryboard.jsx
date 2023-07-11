@@ -152,7 +152,6 @@ const Queryboard = () => {
         // const positions = generateUniquePosition(nodeCount);
         const positions = createNodes(nodeCount);
 
-        debugger;
         const initialNodes = bindings.map((binding, index) => ({
           id: binding.label_subclass.value,
           data: {
@@ -219,12 +218,9 @@ const Queryboard = () => {
     popupCard.style.display = "block";
 
     // Update the popup card content
-    document.getElementById("popup-title").textContent =
-      "Selected Node: " + selectedNodes.id;
-    document.getElementById("popup-size").textContent =
-      "Size: " + selectedNodes.size;
-    document.getElementById("popup-total-nodes").textContent =
-      "Total Nodes: " + selectedNodes.totalNode;
+    document.getElementById("popup-title").textContent = "Selected Node: " + selectedNodes.id;
+    document.getElementById("popup-size").textContent = "Size: " + selectedNodes.size;
+    document.getElementById("popup-total-nodes").textContent = "Total Nodes: " + selectedNodes.totalNode;
 
     // Retrieve the top 5 nodes
     const topNodes = nodes.slice(0, 5);
@@ -366,6 +362,11 @@ const Queryboard = () => {
         <span className="close-button" onClick={closePopup}>
           <AiOutlineClose />
         </span>
+        <div className="left-list">
+          <h2 id="popup-title">TEST</h2>
+          <p id="popup-size"></p>
+          <p id="popup-total-nodes"></p>
+        </div>
         <div className="top-list"></div>
       </div>
     </div>
